@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="style.css">
+
+  <meta charset="UTF-8">
+  <title>Código de Participação</title>
+  <script>
+    // Função para definir um cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    // Função para obter um cookie (CORRIGIDA)
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let ca = document.cookie.split(';');
+        for(let i=0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    // Função para gerar um UUID v4
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function gerarCodigo() {
+      let clientId = getCookie("clientId");
+      if (!clientId) {
+        clientId = generateUUID();
+        setCookie("clientId", clientId, 365);
+      }
+
+      const codigoExistente = localStorage.getItem("codigoParticipacao");
+
+      if (codigoExistente) {
+        document.getElementById("codigo").innerText = codigoExistente;
+        document.getElementById("mensagem").innerText = "Você já gerou um código. Este é o seu código de participação.";
+        console.log("Código existente recuperado do localStorage.");
+        return; 
+      }
+
+      const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const numeros = "0123456789";
+      let codigo = "";
+      for (let i = 0; i < 2; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
+      for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
+      document.getElementById("codigo").innerText = codigo;
+
+      localStorage.setItem("codigoParticipacao", codigo);
+      console.log("Novo código gerado e armazenado no localStorage.");
+
+      // SUBSTITUA O URL ABAIXO PELO URL DA SUA NOVA IMPLANTAÇÃO
+      fetch("https://script.google.com/macros/s/AKfycbxTPV1nsb5vOolJNxE2WStOBAGCp1zGJpICvv_FWAl2FMQPRQN1OTSYE8Ou6AGkByWN/exec", { 
+        method: "POST",
+        body: JSON.stringify({ codigo: codigo, clientId: clientId } ),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+        redirect: "follow"
+      }).then(response => {
+        if (response.ok) {
+            return response.json(); 
+        } else {
+            return response.text().then(text => { throw new Error(text) });
+        }
+      }).catch(error => {
+      });
+    }
+
+    // Função para copiar o código para a área de transferência
+    function copiarCodigo() {
+      const codigo = document.getElementById("codigo").innerText;
+      if (codigo) {
+        navigator.clipboard.writeText(codigo).then(() => {
+          alert("Código copiado para a área de transferência!");
+        }).catch(err => {
+          alert("Falha ao copiar o código: " + err);
+        });
+      }
+    }
+
+    window.onload = gerarCodigo;
+  </script>
+  
+</head>
+<body>
+  <h2>Obrigado por responder!</h2>
+  <p>Seu código de participação é: <strong id="codigo"></strong></p>
+  <p id="mensagem"></p> 
+  <p>Guarde este código para participar do sorteio.</p>
+
+  <button onclick="copiarCodigo()">Copiar Código</button>
+</body>
+</html>

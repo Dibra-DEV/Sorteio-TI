@@ -1,0 +1,51 @@
+body {
+    padding: 18%;
+    justify-content:end;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    text-align: center;
+    background-image: url("background.png")
+}
+
+p {
+    font-size: 30px;
+    margin: 12px 0;
+    line-height: 1.5;
+    align-items: center;
+}
+
+
+h2 {
+    font-size: 35px;
+  color: #B8242A;
+}
+
+#codigo {
+  font-size: 35px;
+  color: #B8242A;
+  font-weight: bold;
+}
+
+#mensagem {
+  margin-top: 10px;
+  font-style: italic;
+}
+
+button {
+  background-color: #B8242A; 
+  color: white; 
+  border: none; 
+  padding: 10px 20px; 
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 10px 0; 
+  cursor: pointer; 
+  border-radius: 5px; 
+}
+
+button:hover {
+  background-color: #8a1d20; 
+}
