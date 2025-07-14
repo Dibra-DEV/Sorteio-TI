@@ -57,13 +57,13 @@
       document.getElementById("codigo").innerText = codigo;
       localStorage.setItem("codigoParticipacao", codigo);
 
-      // ⚠️ URL do seu Google Apps Script Web App
+      //URL do google script
       const endpoint = "https://script.google.com/macros/s/AKfycbzQeiADenP2WFxfM2xxrt-Ff0yGb1fYJ8hMrMp9BNOh9M3Jl7oTWFK1PlNBn8utXZ8Mlg/exec";
 
-      // Envia os dados para a planilha
+      // Enviar dados para planilha
       fetch(endpoint, {
         method: "POST",
-        mode: "no-cors", // ⚠️ ESSENCIAL PARA FUNCIONAR COM GAS!
+        mode: "no-cors",
         headers: {
           "Content-Type": "application/json"
         },
@@ -72,9 +72,9 @@
           codigo: codigo
         })
       }).then(() => {
-        console.log("✅ Código enviado com sucesso.");
+        console.log("Código enviado com sucesso.");
       }).catch(err => {
-        console.error("❌ Erro ao enviar código:", err);
+        console.error("Erro ao enviar código:", err);
       });
     }
 
