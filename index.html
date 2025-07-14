@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="stylesheet" href="style.css">
   <meta charset="UTF-8">
   <title>Código de Participação</title>
+  <link rel="stylesheet" href="style.css">
   <script>
-    // Função para definir um cookie
     function setCookie(name, value, days) {
       let expires = "";
       if (days) {
@@ -16,7 +15,6 @@
       document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
 
-    // Função para obter um cookie
     function getCookie(name) {
       let nameEQ = name + "=";
       let ca = document.cookie.split(';');
@@ -28,11 +26,9 @@
       return null;
     }
 
-    // Gerar UUID v4
     function generateUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0,
-            v = c === 'x' ? r : (r & 0x3 | 0x8);
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       });
     }
@@ -49,7 +45,6 @@
       if (codigoExistente) {
         document.getElementById("codigo").innerText = codigoExistente;
         document.getElementById("mensagem").innerText = "Você já gerou um código. Este é o seu código de participação.";
-        console.log("Código existente recuperado do localStorage.");
         return;
       }
 
@@ -58,28 +53,29 @@
       let codigo = "";
       for (let i = 0; i < 2; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
       for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
+
       document.getElementById("codigo").innerText = codigo;
-
       localStorage.setItem("codigoParticipacao", codigo);
-      console.log("Novo código gerado e armazenado no localStorage.");
 
-      // Envia para o Google Apps Script
-      fetch("https://script.google.com/macros/s/AKfycbwPs7Sccqt0IKC7axmz50UidHg3ibU5tIQjPDL37xAdp-SXoPX9gCDnj4E16eL3pPbesg/exec", {
+      // ⚠️ URL do seu Google Apps Script Web App
+      const endpoint = "https://script.google.com/macros/s/AKfycbzQeiADenP2WFxfM2xxrt-Ff0yGb1fYJ8hMrMp9BNOh9M3Jl7oTWFK1PlNBn8utXZ8Mlg/exec";
+
+      // Envia os dados para a planilha
+      fetch(endpoint, {
         method: "POST",
-        body: JSON.stringify({ codigo: codigo, clientId: clientId }),
-        headers: { "Content-Type": "application/json" }
-      })
-        .then(response => {
-          console.log("Resposta status:", response.status);
-          return response.text(); // Lê a resposta como texto para debug
+        mode: "no-cors", // ⚠️ ESSENCIAL PARA FUNCIONAR COM GAS!
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          clientId: clientId,
+          codigo: codigo
         })
-        .then(text => {
-          console.log("Resposta do servidor:", text);
-        })
-        .catch(error => {
-          console.error("Erro ao enviar dados para a planilha:", error);
-        });
-
+      }).then(() => {
+        console.log("✅ Código enviado com sucesso.");
+      }).catch(err => {
+        console.error("❌ Erro ao enviar código:", err);
+      });
     }
 
     function copiarCodigo() {
