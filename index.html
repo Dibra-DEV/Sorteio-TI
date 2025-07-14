@@ -2,37 +2,37 @@
 <html lang="pt-BR">
 <head>
   <link rel="stylesheet" href="style.css">
-
   <meta charset="UTF-8">
   <title>Código de Participação</title>
   <script>
     // Função para definir um cookie
     function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-            let date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+      let expires = "";
+      if (days) {
+        let date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
 
-    // Função para obter um cookie (CORRIGIDA)
+    // Função para obter um cookie
     function getCookie(name) {
-        let nameEQ = name + "=";
-        let ca = document.cookie.split(';');
-        for(let i=0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
+      let nameEQ = name + "=";
+      let ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
     }
 
-    // Função para gerar um UUID v4
+    // Gerar UUID v4
     function generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        let r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       });
     }
@@ -50,7 +50,7 @@
         document.getElementById("codigo").innerText = codigoExistente;
         document.getElementById("mensagem").innerText = "Você já gerou um código. Este é o seu código de participação.";
         console.log("Código existente recuperado do localStorage.");
-        return; 
+        return;
       }
 
       const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -63,23 +63,30 @@
       localStorage.setItem("codigoParticipacao", codigo);
       console.log("Novo código gerado e armazenado no localStorage.");
 
-      // SUBSTITUA O URL ABAIXO PELO URL DA SUA NOVA IMPLANTAÇÃO
-      fetch("https://script.google.com/macros/s/AKfycbwPs7Sccqt0IKC7axmz50UidHg3ibU5tIQjPDL37xAdp-SXoPX9gCDnj4E16eL3pPbesg/exec", { 
+      // Envia para o Google Apps Script
+      fetch("https://script.google.com/macros/s/AKfycbzQeiADenP2WFxfM2xxrt-Ff0yGb1fYJ8hMrMp9BNOh9M3Jl7oTWFK1PlNBn8utXZ8Mlg/exec", {
         method: "POST",
-        body: JSON.stringify({ codigo: codigo, clientId: clientId } ),
-        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: codigo, clientId: clientId }),
+        headers: {
+          "Content-Type": "application/json"
+        },
         redirect: "follow"
-      }).then(response => {
+      })
+      .then(response => {
         if (response.ok) {
-            return response.json(); 
+          return response.json();
         } else {
-            return response.text().then(text => { throw new Error(text) });
+          return response.text().then(text => { throw new Error(text); });
         }
-      }).catch(error => {
+      })
+      .then(data => {
+        console.log("Código enviado com sucesso:", data);
+      })
+      .catch(error => {
+        console.error("Erro ao enviar código para o Google Apps Script:", error);
       });
     }
 
-    // Função para copiar o código para a área de transferência
     function copiarCodigo() {
       const codigo = document.getElementById("codigo").innerText;
       if (codigo) {
@@ -93,16 +100,13 @@
 
     window.onload = gerarCodigo;
   </script>
-  
 </head>
 <body>
-  
   <h2>Obrigado por responder!</h2>
   <p>Seu código de participação é: <strong id="codigo"></strong></p>
-  <p id="mensagem"></p> 
+  <p id="mensagem"></p>
   <p>Guarde este código para participar do sorteio.</p>
   <p>O resultado será divulgado em <strong>31/07</strong>.</p>
-
   <button onclick="copiarCodigo()">Copiar Código</button>
 </body>
 </html>
