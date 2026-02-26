@@ -72,9 +72,10 @@
         // Enviar dados para planilha
         fetch(endpoint, {
           method: "POST",
-          mode: "no-cors",
+          //mode: "no-cors",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "text/plain;charset=utf-8",
+            //"Content-Type": "application/json",
           },
           body: JSON.stringify({
             clientId: clientId,
