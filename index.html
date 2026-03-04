@@ -5,12 +5,12 @@
     <title>Código de Participação</title>
     <link rel="stylesheet" href="style.css" />
     <script>
-      // 1. Gerenciamento de Cookies para ClientID
+      // 1. Gerenciamento de Cookies
       function setCookie(name, value, days) {
         let expires = "";
         if (days) {
           let date = new Date();
-          date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
           expires = "; expires=" + date.toUTCString();
         }
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
@@ -18,16 +18,16 @@
 
       function getCookie(name) {
         let nameEQ = name + "=";
-        let ca = document.cookie.split(";");
+        let ca = document.cookie.split(';');
         for (let i = 0; i < ca.length; i++) {
           let c = ca[i];
-          while (c.charAt(0) === " ") c = c.substring(1, c.length);
-          if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+          while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
       }
 
-      // 2. Gerador de ID Único
+      // 2. Gerador de UUID
       function generateUUID() {
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
           var r = (Math.random() * 16) | 0,
@@ -36,62 +36,61 @@
         });
       }
 
-      // 3. Lógica Principal
+      // 3. Lógica de Geração e Envio
       function gerarCodigo() {
         const displayCodigo = document.getElementById("codigo");
         const displayMensagem = document.getElementById("mensagem");
 
-        // Recupera ou gera o ClientID (Cookie)
+        // Recupera ou cria ClientID
         let clientId = getCookie("clientId");
         if (!clientId) {
           clientId = generateUUID();
           setCookie("clientId", clientId, 365);
         }
 
-        // Verifica se já existe um código gerado (LocalStorage)
+        // Verifica se já gerou código
         const codigoExistente = localStorage.getItem("codigoParticipacao");
         if (codigoExistente) {
           displayCodigo.innerText = codigoExistente;
           displayMensagem.innerText = "Você já gerou um código. Este é o seu código de participação.";
-          return; // Interrompe para não gerar novo nem reenviar
+          return;
         }
 
-        // Gera novo código aleatório
+        // Gera novo código (2 letras + 4 números)
         const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const numeros = "0123456789";
         let codigo = "";
         for (let i = 0; i < 2; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
         for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
 
-        // Exibe e Salva localmente
         displayCodigo.innerText = codigo;
         localStorage.setItem("codigoParticipacao", codigo);
 
-        // Envio para Google Forms
+        // Envio para o Google Forms
         const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSfWZe9Gb23CPJU8z8OINd7QNqK24xvicmYxNhOWPUxF1ZYi6g/formResponse";
         
-        const formData = new URLSearchParams();
-        formData.append("entry.609123402", clientId);  // Para o campo ClientID
-        formData.append("entry.1778166267", codigo);   // Para o campo Codigo
+        const params = new URLSearchParams();
+        params.append("entry.609123402", clientId);
+        params.append("entry.1778166267", codigo);
 
         fetch(formURL, {
           method: "POST",
           mode: "no-cors",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: formData.toString(),
+          body: params.toString()
         })
-          .then(() => console.log("Dados registrados com sucesso."))
-          .catch((err) => console.error("Erro ao registrar dados:", err));
+        .then(() => console.log("Processo de registro finalizado."))
+        .catch((err) => console.error("Erro no registro:", err));
       }
 
       function copiarCodigo() {
         const codigo = document.getElementById("codigo").innerText;
         if (codigo) {
           navigator.clipboard.writeText(codigo)
-            .then(() => alert("Código copiado com sucesso!"))
-            .catch((err) => alert("Falha ao copiar: " + err));
+            .then(() => alert("Código copiado!"))
+            .catch((err) => alert("Erro ao copiar: " + err));
         }
       }
 
@@ -99,11 +98,13 @@
     </script>
   </head>
   <body>
-    <h2>Obrigado por responder!</h2>
-    <p>Seu código de participação é: <strong id="codigo"></strong></p>
-    <p id="mensagem"></p>
-    <p>Guarde este código para participar do sorteio.</p>
-    <p>O resultado será divulgado em <strong>31/03/2026</strong>.</p>
-    <button onclick="copiarCodigo()">Copiar Código</button>
+    <div class="container">
+      <h2>Obrigado por responder!</h2>
+      <p>Seu código de participação é: <strong id="codigo"></strong></p>
+      <p id="mensagem"></p>
+      <p>Guarde este código para participar do sorteio.</p>
+      <p>O resultado será divulgado em <strong>31/03/2026</strong>.</p>
+      <button onclick="copiarCodigo()">Copiar Código</button>
+    </div>
   </body>
 </html>
