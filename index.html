@@ -5,6 +5,7 @@
     <title>Código de Participação</title>
     <link rel="stylesheet" href="style.css" />
     <script>
+      // 1. Gerenciamento de Cookies para ClientID
       function setCookie(name, value, days) {
         let expires = "";
         if (days) {
@@ -26,6 +27,7 @@
         return null;
       }
 
+      // 2. Gerador de ID Único
       function generateUUID() {
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
           var r = (Math.random() * 16) | 0,
@@ -34,55 +36,62 @@
         });
       }
 
+      // 3. Lógica Principal
       function gerarCodigo() {
+        const displayCodigo = document.getElementById("codigo");
+        const displayMensagem = document.getElementById("mensagem");
+
+        // Recupera ou gera o ClientID (Cookie)
         let clientId = getCookie("clientId");
         if (!clientId) {
           clientId = generateUUID();
           setCookie("clientId", clientId, 365);
         }
 
+        // Verifica se já existe um código gerado (LocalStorage)
         const codigoExistente = localStorage.getItem("codigoParticipacao");
-        const displayCodigo = document.getElementById("codigo");
-        const displayMensagem = document.getElementById("mensagem");
-
         if (codigoExistente) {
           displayCodigo.innerText = codigoExistente;
           displayMensagem.innerText = "Você já gerou um código. Este é o seu código de participação.";
-          return;
+          return; // Interrompe para não gerar novo nem reenviar
         }
 
+        // Gera novo código aleatório
         const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const numeros = "0123456789";
         let codigo = "";
         for (let i = 0; i < 2; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
         for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
 
+        // Exibe e Salva localmente
         displayCodigo.innerText = codigo;
         localStorage.setItem("codigoParticipacao", codigo);
 
-        const endpoint = "https://script.google.com/macros/s/AKfycbyK95rVJ1MEBbkaoF_8DT6_YhQvUE1w_d1kcmwBf8XU/dev";
+        // Envio para Google Forms
+        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSfWZe9Gb23CPJU8z8OINd7QNqK24xvicmYxNhOWPUxF1ZYi6g/formResponse";
+        
+        const formData = new URLSearchParams();
+        formData.append("entry.1345915509", clientId); // ID do campo ClientID no Forms
+        formData.append("entry.1537156972", codigo);   // ID do campo Código no Forms
 
-        fetch(endpoint, {
+        fetch(formURL, {
           method: "POST",
-          mode: "no-cors", // Necessário para Google Apps Script
+          mode: "no-cors",
           headers: {
-            "Content-Type": "text/plain;charset=utf-8",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: JSON.stringify({
-            clientId: clientId,
-            codigo: codigo,
-          }),
+          body: formData.toString(),
         })
-          .then(() => console.log("Dados enviados."))
-          .catch((err) => console.error("Erro no envio:", err));
+          .then(() => console.log("Dados registrados com sucesso."))
+          .catch((err) => console.error("Erro ao registrar dados:", err));
       }
 
       function copiarCodigo() {
         const codigo = document.getElementById("codigo").innerText;
         if (codigo) {
           navigator.clipboard.writeText(codigo)
-            .then(() => alert("Código copiado!"))
-            .catch((err) => alert("Erro ao copiar: " + err));
+            .then(() => alert("Código copiado com sucesso!"))
+            .catch((err) => alert("Falha ao copiar: " + err));
         }
       }
 
