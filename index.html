@@ -21,21 +21,17 @@
         for (let i = 0; i < ca.length; i++) {
           let c = ca[i];
           while (c.charAt(0) === " ") c = c.substring(1, c.length);
-          if (c.indexOf(nameEQ) === 0)
-            return c.substring(nameEQ.length, c.length);
+          if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
       }
 
       function generateUUID() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-          /[xy]/g,
-          function (c) {
-            var r = (Math.random() * 16) | 0,
-              v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-          },
-        );
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+          var r = (Math.random() * 16) | 0,
+            v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
       }
 
       function gerarCodigo() {
@@ -46,61 +42,47 @@
         }
 
         const codigoExistente = localStorage.getItem("codigoParticipacao");
+        const displayCodigo = document.getElementById("codigo");
+        const displayMensagem = document.getElementById("mensagem");
 
         if (codigoExistente) {
-          document.getElementById("codigo").innerText = codigoExistente;
-          document.getElementById("mensagem").innerText =
-            "Você já gerou um código. Este é o seu código de participação.";
+          displayCodigo.innerText = codigoExistente;
+          displayMensagem.innerText = "Você já gerou um código. Este é o seu código de participação.";
           return;
         }
 
         const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const numeros = "0123456789";
         let codigo = "";
-        for (let i = 0; i < 2; i++)
-          codigo += letras[Math.floor(Math.random() * letras.length)];
-        for (let i = 0; i < 4; i++)
-          codigo += numeros[Math.floor(Math.random() * numeros.length)];
+        for (let i = 0; i < 2; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
+        for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
 
-        document.getElementById("codigo").innerText = codigo;
+        displayCodigo.innerText = codigo;
         localStorage.setItem("codigoParticipacao", codigo);
 
-        //URL do google script
-        const endpoint =
-          "https://script.google.com/macros/s/AKfycbzQeiADenP2WFxfM2xxrt-Ff0yGb1fYJ8hMrMp9BNOh9M3Jl7oTWFK1PlNBn8utXZ8Mlg/exec";
+        const endpoint = "SUA_URL_DO_GOOGLE_SCRIPT_AQUI";
 
-        // Enviar dados para planilha
         fetch(endpoint, {
           method: "POST",
-          //mode: "no-cors",
+          mode: "no-cors", // Necessário para Google Apps Script
           headers: {
             "Content-Type": "text/plain;charset=utf-8",
-            //"Content-Type": "application/json",
           },
           body: JSON.stringify({
             clientId: clientId,
             codigo: codigo,
           }),
         })
-          .then(() => {
-            console.log("Código enviado com sucesso.");
-          })
-          .catch((err) => {
-            console.error("Erro ao enviar código:", err);
-          });
+          .then(() => console.log("Dados enviados."))
+          .catch((err) => console.error("Erro no envio:", err));
       }
 
       function copiarCodigo() {
         const codigo = document.getElementById("codigo").innerText;
         if (codigo) {
-          navigator.clipboard
-            .writeText(codigo)
-            .then(() => {
-              alert("Código copiado para a área de transferência!");
-            })
-            .catch((err) => {
-              alert("Falha ao copiar o código: " + err);
-            });
+          navigator.clipboard.writeText(codigo)
+            .then(() => alert("Código copiado!"))
+            .catch((err) => alert("Erro ao copiar: " + err));
         }
       }
 
