@@ -49,7 +49,7 @@
         }
 
         // Verifica se já gerou código
-        const codigoExistente = localStorage.getItem("codigoParticipacao");
+        const codigoExistente = localStorage.getItem("codigoParticipacao1");
         if (codigoExistente) {
           displayCodigo.innerText = codigoExistente;
           displayMensagem.innerText = "Você já gerou um código. Este é o seu código de participação.";
@@ -64,7 +64,7 @@
         for (let i = 0; i < 4; i++) codigo += numeros[Math.floor(Math.random() * numeros.length)];
 
         displayCodigo.innerText = codigo;
-        localStorage.setItem("codigoParticipacao", codigo);
+        localStorage.setItem("codigoParticipacao1", codigo);
 
         // Envio para o Google Forms
         const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSfWZe9Gb23CPJU8z8OINd7QNqK24xvicmYxNhOWPUxF1ZYi6g/formResponse";
